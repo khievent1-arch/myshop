@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout - Order Now</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .form-container { max-width: 400px; margin: auto; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+        input, textarea { width: 95%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; }
+        button { background: #007bff; color: white; padding: 10px; width: 100%; border: none; cursor: pointer; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Checkout (Cash on Delivery)</h2>
+    <div style="background:#f0f0f0; padding:10px; margin-bottom:15px;">
+        <p><strong>Item:</strong> <span id="cItem">Loading...</span></p>
+        <p><strong>Total to Pay:</strong> Rs. <span id="cTotal">0</span></p>
+    </div>
+
+    <form onsubmit="placeOrder(event)">
+        <input type="text" id="cName" placeholder="Full Name" required>
+        <input type="tel" id="cMobile" placeholder="Mobile Number" required>
+        <textarea id="cAddress" rows="3" placeholder="Full Address" required></textarea>
+        <button type="submit">CONFIRM ORDER</button>
+    </form>
+    
+    <br>
+    <a href="index.html">Back to Product</a>
+</div>
+
+<script>
+    // Saved order uthayen
+    var order = JSON.parse(localStorage.getItem('myOrder'));
+    
+    if(order) {
+        document.getElementById('cItem').innerText = order.title + " (x" + order.qty + ")";
+        document.getElementById('cTotal').innerText = order.total;
+    }
+
+    function placeOrder(e) {
+        e.preventDefault();
+        
+        var name = document.getElementById('cName').value;
+        var mobile = document.getElementById('cMobile').value;
+        var address = document.getElementById('cAddress').value;
+
+        // Data Dashboard ke liye save karein
+        var newOrder = {
+            date: new Date().toLocaleDateString(),
+            name: name,
+            mobile: mobile,
+            address: address,
+            item: order.title,
+            qty: order.qty,
+            total: order.total
+        };
+
+        var allOrders = JSON.parse(localStorage.getItem('sellerOrders')) || [];
+        allOrders.push(newOrder);
+        localStorage.setItem('sellerOrders', JSON.stringify(allOrders));
+
+        // WhatsApp message banayein (Apna number dalein)
+        var msg = "New Order! Name: " + name + ", Mobile: " + mobile + ", Item: " + order.title + " Qty: " + order.qty + ", Bill: " + order.total;
+        
+        // WhatsApp par le jayen (Number change karein niche)
+        window.location.href = "https://wa.me/923001234567?text=" + encodeURIComponent(msg);
+    }
+</script>
+
+</body>
+</html>
