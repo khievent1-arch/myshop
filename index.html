@@ -1,56 +1,115 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Shop - Product</title>
+    <title>My Shop - All Products</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
-        .product-card { background: white; border: 1px solid #ddd; padding: 20px; max-width: 400px; margin: auto; border-radius: 8px; }
-        img { max-width: 100%; border-radius: 5px; }
-        button { background: #28a745; color: white; border: none; padding: 10px 20px; width: 100%; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        button:hover { background: #218838; }
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; text-align: center; }
+        
+        /* Grid System for Multiple Products */
+        .products-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            width: 300px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        img { width: 100%; height: 200px; object-fit: cover; border-radius: 5px; }
+        h3 { margin: 10px 0; font-size: 18px; }
+        .price { color: #28a745; font-weight: bold; font-size: 20px; }
+        
+        select { padding: 5px; margin: 10px 0; width: 100%; }
+        button { background: #007bff; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 5px; }
+        button:hover { background: #0056b3; }
     </style>
 </head>
 <body>
 
-<div class="product-card">
-    <img src="https://via.placeholder.com/400x300?text=Luxury+Watch" alt="Product Image">
-    <h2 id="pTitle">Luxury Wrist Watch</h2>
-    <p>Premium quality, waterproof watch.</p>
-    <h3>Price: Rs. <span id="pPrice">2500</span></h3>
-    
-    <label>Quantity:</label>
-    <select id="pQty" onchange="calculateTotal()" style="padding:5px;">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-    </select>
-    
-    <p style="background:#eee; padding:10px;"><strong>Total: Rs. <span id="pTotal">2500</span></strong></p>
+<h1>Welcome to My Shop</h1>
+<p>Best Quality Products in Pakistan</p>
 
-    <button onclick="addToCart()">ADD TO CART & BUY</button>
+<!-- SAARE PRODUCTS IS DIV KE ANDAR HONGE -->
+<div class="products-grid">
+
+    <!-- PRODUCT 1 SHURU -->
+    <div class="product-card">
+        <img src="https://via.placeholder.com/300?text=Watch" alt="Watch">
+        <h3>Luxury Watch</h3>
+        <p class="price">Rs. 2500</p>
+        
+        <label>Quantity:</label>
+        <select id="qty1">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </select>
+        
+        <!-- Har button mein product ka naam, price aur qty ID alag hoga -->
+        <button onclick="buyNow('Luxury Watch', 2500, 'qty1')">ORDER NOW</button>
+    </div>
+    <!-- PRODUCT 1 KHATAM -->
+
+    <!-- PRODUCT 2 SHURU -->
+    <div class="product-card">
+        <img src="https://via.placeholder.com/300?text=Shoes" alt="Shoes">
+        <h3>Running Shoes</h3>
+        <p class="price">Rs. 1500</p>
+        
+        <label>Quantity:</label>
+        <select id="qty2">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </select>
+
+        <!-- Note karein: Yahan qty2 likha hai -->
+        <button onclick="buyNow('Running Shoes', 1500, 'qty2')">ORDER NOW</button>
+    </div>
+    <!-- PRODUCT 2 KHATAM -->
+
+     <!-- PRODUCT 3 SHURU -->
+    <div class="product-card">
+        <img src="https://via.placeholder.com/300?text=Shoes3" alt="Shoes">
+        <h3>Running Shoes</h3>
+        <p class="price">Rs. 1300</p>
+        
+        <label>Quantity:</label>
+        <select id="qty2">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </select>
+
+        <!-- Note karein: Yahan qty2 likha hai -->
+        <button onclick="buyNow('Running Shoes', 1500, 'qty2')">ORDER NOW</button>
+    </div>
+    <!-- PRODUCT 2 KHATAM -->
+
 </div>
 
 <script>
-    function calculateTotal() {
-        var price = 2500; // Price fix hai
-        var qty = document.getElementById('pQty').value;
-        document.getElementById('pTotal').innerText = price * qty;
-    }
+    function buyNow(productName, productPrice, qtyId) {
+        var quantity = document.getElementById(qtyId).value;
+        var totalAmount = productPrice * quantity;
 
-    function addToCart() {
-        var productData = {
-            title: "Luxury Wrist Watch",
-            price: 2500,
-            qty: document.getElementById('pQty').value,
-            total: document.getElementById('pTotal').innerText
+        var orderData = {
+            title: productName,
+            price: productPrice,
+            qty: quantity,
+            total: totalAmount
         };
-        // Data browser mein save karein
-        localStorage.setItem('myOrder', JSON.stringify(productData));
-        
-        // Checkout page par bhejein
-        window.location.href = "checkout.html"; 
+
+        // Save data and go to checkout
+        localStorage.setItem('myOrder', JSON.stringify(orderData));
+        window.location.href = "checkout.html";
     }
 </script>
 
