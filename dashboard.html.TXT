@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Seller Dashboard</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #333; color: white; }
+    </style>
+</head>
+<body>
+
+<h1>My Seller Dashboard</h1>
+<button onclick="location.reload()">Refresh Orders</button>
+<button onclick="clearAll()" style="background:red; color:white; border:none; padding:5px 10px;">Clear History</button>
+
+<table id="orderTable">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>Product</th>
+            <th>Total</th>
+            <th>Address</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Orders yahan ayenge -->
+    </tbody>
+</table>
+
+<script>
+    var orders = JSON.parse(localStorage.getItem('sellerOrders')) || [];
+    var tbody = document.querySelector("#orderTable tbody");
+
+    if(orders.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='6'>No orders yet.</td></tr>";
+    } else {
+        // Naye orders pehle dikhaye
+        orders.reverse().forEach(function(o) {
+            var row = `<tr>
+                <td>${o.date}</td>
+                <td>${o.name}</td>
+                <td>${o.mobile}</td>
+                <td>${o.item} (x${o.qty})</td>
+                <td>Rs. ${o.total}</td>
+                <td>${o.address}</td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function clearAll() {
+        if(confirm("Delete all orders?")) {
+            localStorage.removeItem('sellerOrders');
+            location.reload();
+        }
+    }
+</script>
+
+</body>
+</html>

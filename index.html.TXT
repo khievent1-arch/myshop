@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Shop - Product</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
+        .product-card { background: white; border: 1px solid #ddd; padding: 20px; max-width: 400px; margin: auto; border-radius: 8px; }
+        img { max-width: 100%; border-radius: 5px; }
+        button { background: #28a745; color: white; border: none; padding: 10px 20px; width: 100%; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        button:hover { background: #218838; }
+    </style>
+</head>
+<body>
+
+<div class="product-card">
+    <img src="https://via.placeholder.com/400x300?text=Luxury+Watch" alt="Product Image">
+    <h2 id="pTitle">Luxury Wrist Watch</h2>
+    <p>Premium quality, waterproof watch.</p>
+    <h3>Price: Rs. <span id="pPrice">2500</span></h3>
+    
+    <label>Quantity:</label>
+    <select id="pQty" onchange="calculateTotal()" style="padding:5px;">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
+    
+    <p style="background:#eee; padding:10px;"><strong>Total: Rs. <span id="pTotal">2500</span></strong></p>
+
+    <button onclick="addToCart()">ADD TO CART & BUY</button>
+</div>
+
+<script>
+    function calculateTotal() {
+        var price = 2500; // Price fix hai
+        var qty = document.getElementById('pQty').value;
+        document.getElementById('pTotal').innerText = price * qty;
+    }
+
+    function addToCart() {
+        var productData = {
+            title: "Luxury Wrist Watch",
+            price: 2500,
+            qty: document.getElementById('pQty').value,
+            total: document.getElementById('pTotal').innerText
+        };
+        // Data browser mein save karein
+        localStorage.setItem('myOrder', JSON.stringify(productData));
+        
+        // Checkout page par bhejein
+        window.location.href = "checkout.html"; 
+    }
+</script>
+
+</body>
+</html>
