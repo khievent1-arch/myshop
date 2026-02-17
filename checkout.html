@@ -1,73 +1,119 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Checkout - Order Now</title>
+    <title>Checkout - Secure Payment</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .form-container { max-width: 400px; margin: auto; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
-        input, textarea { width: 95%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; }
-        button { background: #007bff; color: white; padding: 10px; width: 100%; border: none; cursor: pointer; font-size: 16px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 20px; }
+        .checkout-container { 
+            background: white; 
+            max-width: 450px; 
+            margin: 30px auto; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+        }
+        h2 { text-align: center; color: #333; margin-bottom: 20px; }
+        .summary { background: #e9f7ef; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 5px solid #27ae60; }
+        
+        label { font-weight: bold; display: block; margin-top: 10px; color: #555; }
+        input, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        
+        button { 
+            background: #2874f0; 
+            color: white; 
+            width: 100%; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 5px; 
+            font-size: 18px; 
+            margin-top: 20px; 
+            cursor: pointer; 
+            font-weight: bold;
+        }
+        button:hover { background: #0056b3; }
+        .loader { display: none; text-align: center; margin-top: 10px; color: #666; }
     </style>
 </head>
 <body>
 
-<div class="form-container">
-    <h2>Checkout (Cash on Delivery)</h2>
-    <div style="background:#f0f0f0; padding:10px; margin-bottom:15px;">
-        <p><strong>Item:</strong> <span id="cItem">Loading...</span></p>
-        <p><strong>Total to Pay:</strong> Rs. <span id="cTotal">0</span></p>
+<div class="checkout-container">
+    <h2>Secure Checkout</h2>
+    
+    <!-- Order Summary -->
+    <div class="summary">
+        <p><strong>Item:</strong> <span id="cItem">...</span></p>
+        <p><strong>Total Amount:</strong> Rs. <span id="cTotal">0</span></p>
     </div>
 
-    <form onsubmit="placeOrder(event)">
-        <input type="text" id="cName" placeholder="Full Name" required>
-        <input type="tel" id="cMobile" placeholder="Mobile Number" required>
-        <textarea id="cAddress" rows="3" placeholder="Full Address" required></textarea>
-        <button type="submit">CONFIRM ORDER</button>
+    <form id="orderForm">
+        <label>Full Name</label>
+        <input type="text" name="name" required placeholder="Ali Khan">
+        
+        <label>Mobile Number</label>
+        <input type="tel" name="mobile" required placeholder="0300-1234567">
+
+        <label>Email Address (Optional)</label>
+        <input type="email" name="email" placeholder="ali@gmail.com">
+        
+        <label>Shipping Address</label>
+        <textarea name="address" rows="3" required placeholder="House #, Street, City"></textarea>
+        
+        <!-- Hidden fields to send product data -->
+        <input type="hidden" name="product" id="hProduct">
+        <input type="hidden" name="qty" id="hQty">
+        <input type="hidden" name="total" id="hTotal">
+
+        <button type="submit" id="btnSubmit">CONFIRM ORDER</button>
+        <p class="loader" id="loader">Processing Order... Please wait.</p>
     </form>
-    
-    <br>
-    <a href="index.html">Back to Product</a>
 </div>
 
 <script>
-    // Saved order uthayen
+    // 1. Load Data from LocalStorage
     var order = JSON.parse(localStorage.getItem('myOrder'));
     
     if(order) {
         document.getElementById('cItem').innerText = order.title + " (x" + order.qty + ")";
         document.getElementById('cTotal').innerText = order.total;
+        
+        // Hidden inputs mein data bharein taake form ke sath jaye
+        document.getElementById('hProduct').value = order.title;
+        document.getElementById('hQty').value = order.qty;
+        document.getElementById('hTotal').value = order.total;
+    } else {
+        document.body.innerHTML = "<h3 style='text-align:center'>Cart is Empty. Go back.</h3>";
     }
 
-    function placeOrder(e) {
-        e.preventDefault();
+    // 2. Send Data to Google Sheet
+    var form = document.getElementById('orderForm');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault(); // Page refresh hone se rokein
         
-        var name = document.getElementById('cName').value;
-        var mobile = document.getElementById('cMobile').value;
-        var address = document.getElementById('cAddress').value;
+        document.getElementById('btnSubmit').style.display = 'none'; // Button chupayen
+        document.getElementById('loader').style.display = 'block'; // Loading dikhayen
 
-        // Data Dashboard ke liye save karein
-        var newOrder = {
-            date: new Date().toLocaleDateString(),
-            name: name,
-            mobile: mobile,
-            address: address,
-            item: order.title,
-            qty: order.qty,
-            total: order.total
-        };
-
-        var allOrders = JSON.parse(localStorage.getItem('sellerOrders')) || [];
-        allOrders.push(newOrder);
-        localStorage.setItem('sellerOrders', JSON.stringify(allOrders));
-
-        // WhatsApp message banayein (Apna number dalein)
-        var msg = "New Order! Name: " + name + ", Mobile: " + mobile + ", Item: " + order.title + " Qty: " + order.qty + ", Bill: " + order.total;
+        var data = new FormData(form);
         
-        // WhatsApp par le jayen (Number change karein niche)
-        window.location.href = "https://wa.me/923122339934?text=" + encodeURIComponent(msg);
-    }
+        // ******************************************************
+        // https://script.google.com/macros/s/AKfycbwh0IS-OhA9-JctvYmxacPIJ2yRY0eCkQ9cacOiWJHBU0fCr1qwfNmF6P6FKN-xfX-_/exec
+        // ******************************************************
+        var scriptURL = "YAHAN_APNA_GOOGLE_SCRIPT_URL_PASTE_KAREIN"; 
+
+        fetch(scriptURL, { method: 'POST', body: data })
+            .then(response => {
+                alert("Order Placed Successfully! We will contact you soon.");
+                localStorage.removeItem('myOrder'); // Cart clear karein
+                window.location.href = "index.html"; // Wapis home page bhejein
+            })
+            .catch(error => {
+                alert("Error! Please try again.");
+                console.error('Error!', error.message);
+                document.getElementById('btnSubmit').style.display = 'block';
+                document.getElementById('loader').style.display = 'none';
+            });
+    });
 </script>
 
 </body>
-
 </html>
